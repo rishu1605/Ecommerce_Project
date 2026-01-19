@@ -22,7 +22,8 @@ def main():
             {"id": 102, "name": "Headphones", "price": 50},
             {"id": 103, "name": "Smartphone", "price": 600},
             {"id": 104, "name": "Smartwatch", "price": 200},
-            {"id": 105, "name": "Tablet", "price": 300}
+            {"id": 105, "name": "Tablet", "price": 300},
+            {"id": 106, "name": "Camera", "price": 450},
         ]
         for p in products:
             col1, col2 = st.columns([3, 1])
