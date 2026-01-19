@@ -167,4 +167,4 @@ elif choice == "Admin Panel":
             st.session_state.complaints = []
             st.rerun()
     else:
-        st.info("No pending complaints in the system.")
+        st.info("No pending complaints in the system, THANKYOU!")
