@@ -45,7 +45,7 @@ def main():
         "name": "Men Leather Jacket",
         "price": 20,
         "category": "Men Wearing",
-        "desc": "Stylish Men Jacket",
+        "desc": "Stylish Men Jacket best for winter Wearing",
         "img": "images/leatherjacket.png"
     },
 ]
