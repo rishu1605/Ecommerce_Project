@@ -22,7 +22,7 @@ def save_complaint(name, product, issue):
         st.session_state.complaints = []
     st.session_state.complaints.append({
         "User": name, 
-        "Product": product, 
+        "Product": product,
         "Issue": issue
     })
     return True
