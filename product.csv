@@ -1,0 +1,61 @@
+name,price,category,image
+"Smartphone Pro Max",999.99,Electronic,https://images.unsplash.com/photo-1511707171634-5f897ff02aa9
+"Noise Cancelling Headphones",249.50,Electronic,https://images.unsplash.com/photo-1505740420928-5e560c06d30e
+"Mechanical Keyboard",120.00,Electronic,https://images.unsplash.com/photo-1511467687858-23d96c32e4ae
+"Smart Watch Series 7",350.00,Electronic,https://images.unsplash.com/photo-1523275335684-37898b6baf30
+"4K Gaming Monitor",450.00,Electronic,https://images.unsplash.com/photo-1527443224154-c4a3942d3acf
+"Laptop Stand Aluminum",45.00,Electronic,https://images.unsplash.com/photo-1527443224154-c4a3942d3acf
+"Wireless Mouse",25.99,Electronic,https://images.unsplash.com/photo-1527443224154-c4a3942d3acf
+"Bluetooth Speaker",89.00,Electronic,https://images.unsplash.com/photo-1608156639585-b3a032ef9689
+"External SSD 1TB",110.00,Electronic,https://images.unsplash.com/photo-1597740985671-2a8a3b80502e
+"Webcam 1080p",65.00,Electronic,https://images.unsplash.com/photo-1588508065123-287b28e013da
+"Cotton Crewneck T-Shirt",25.00,Clothing,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab
+"Slim Fit Denim Jeans",55.00,Clothing,https://images.unsplash.com/photo-1542272604-787c3835535d
+"Leather Biker Jacket",120.00,Clothing,https://images.unsplash.com/photo-1551028719-00167b16eac5
+"Summer Floral Dress",45.00,Clothing,https://images.unsplash.com/photo-1572804013307-a9a111daad32
+"Wool Blend Overcoat",180.00,Clothing,https://images.unsplash.com/photo-1539571696357-5a69c17a67c6
+"Canvas High-Top Sneakers",65.00,Clothing,https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77
+"Hooded Sweatshirt",40.00,Clothing,https://images.unsplash.com/photo-1556821840-3a63f95609a7
+"Linen Button-Down Shirt",35.00,Clothing,https://images.unsplash.com/photo-1596755094514-f87e34085b2c
+"Silk Scarf",30.00,Clothing,https://images.unsplash.com/photo-1606760227091-3dd870d97f1d
+"Athletic Joggers",38.00,Clothing,https://images.unsplash.com/photo-1580487212162-73073c9b7da5
+"Diamond Stud Earrings",450.00,Jewelry,https://images.unsplash.com/photo-1535632066927-ab7c9ab60908
+"Gold Chain Necklace",299.00,Jewelry,https://images.unsplash.com/photo-1599643478123-53d3d055428d
+"Silver Engagement Ring",850.00,Jewelry,https://images.unsplash.com/photo-1605100804763-247f67b3557e
+"Pearl Bracelet",120.00,Jewelry,https://images.unsplash.com/photo-1573408301185-9146fe634ad0
+"Luxury Chronograph Watch",1200.00,Jewelry,https://images.unsplash.com/photo-1524592094714-0f0654e20314
+"Rose Gold Bangle",180.00,Jewelry,https://images.unsplash.com/photo-1515562141207-7a88fb7ce338
+"Sapphire Pendant",320.00,Jewelry,https://images.unsplash.com/photo-1584302174649-52c74000459a
+"Hoop Earrings 14k Gold",95.00,Jewelry,https://images.unsplash.com/photo-1635767798638-3e25273a8236
+"Bohemian Beaded Anklet",25.00,Jewelry,https://images.unsplash.com/photo-1515562141207-7a88fb7ce338
+"Custom Nameplate Necklace",75.00,Jewelry,https://images.unsplash.com/photo-1601121141461-9d6647bca1ed
+"Yoga Mat Eco-Friendly",45.00,Sports,https://images.unsplash.com/photo-1544367567-0f2fcb009e0b
+"Dumbbell Set 10kg",60.00,Sports,https://images.unsplash.com/photo-1583454110551-21f2fa2afe61
+"Professional Soccer Ball",30.00,Sports,https://images.unsplash.com/photo-1574629810360-7efbbe195018
+"Running Shoes Carbon Fiber",140.00,Sports,https://images.unsplash.com/photo-1542291026-7eec264c27ff
+"Tennis Racket Carbon Pro",110.00,Sports,https://images.unsplash.com/photo-1622279457486-62dcc4a4bd13
+"Resistance Band Set",20.00,Sports,https://images.unsplash.com/photo-1517836357463-d25dfeac3438
+"Basketball Official Size",25.00,Sports,https://images.unsplash.com/photo-1519861531473-9200262188bf
+"Cycling Helmet",55.00,Sports,https://images.unsplash.com/photo-1557685888-2d02241c6d16
+"Hiking Backpack 40L",85.00,Sports,https://images.unsplash.com/photo-1553062407-98eeb64c6a62
+"Stainless Steel Water Bottle",18.00,Sports,https://images.unsplash.com/photo-1602143307185-84e67439555c
+"Organic Espresso Beans",19.00,Groceries,https://images.unsplash.com/photo-1559056199-641a0ac8b55e
+"Extra Virgin Olive Oil",14.00,Groceries,https://images.unsplash.com/photo-1474979266404-7eaacbad8a0f
+"Dark Chocolate 70%",5.50,Groceries,https://images.unsplash.com/photo-1511381939415-e44015466834
+"Himalayan Pink Salt",6.00,Groceries,https://images.unsplash.com/photo-1512061659335-288e5f84d48a
+"Gluten-Free Almond Flour",12.00,Groceries,https://images.unsplash.com/photo-1509440159596-0249088772ff
+"Manuka Honey MGO 400",35.00,Groceries,https://images.unsplash.com/photo-1587049352846-4a222e784d38
+"Maple Syrup Grade A",11.00,Groceries,https://images.unsplash.com/photo-1582760827937-27954955110d
+"Organic Quinoa 1kg",9.00,Groceries,https://images.unsplash.com/photo-1586201375761-83865001e31c
+"Avocado Oil Spray",8.00,Groceries,https://images.unsplash.com/photo-1474979266404-7eaacbad8a0f
+"Green Tea Matcha Powder",22.00,Groceries,https://images.unsplash.com/photo-1582793988951-9aed5509eb97
+"Ergonomic Office Chair",199.00,Other,https://images.unsplash.com/photo-1505797149-43b0ad766a67
+"Scented Soy Candle",15.00,Other,https://images.unsplash.com/photo-1603006905003-be475563bc59
+"Ceramic Coffee Mug Set",24.00,Other,https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6
+"Soft Throw Blanket",35.00,Other,https://images.unsplash.com/photo-1513201099705-a9746e1e201f
+"Electric Essential Oil Diffuser",40.00,Other,https://images.unsplash.com/photo-1608571423902-eed4a5ad8108
+"Planner & Notebook Set",22.00,Other,https://images.unsplash.com/photo-1531346878377-a5be20888e57
+"Bamboo Bath Mat",18.00,Other,https://images.unsplash.com/photo-1527515637462-cff94eecc1ac
+"Succulent Pot Trio",28.00,Other,https://images.unsplash.com/photo-1520302630591-fd1c66ed11a3
+"Memory Foam Pillow",45.00,Other,https://images.unsplash.com/photo-1584132967334-10e028bd69f7
+"Wall Clock Minimalist",30.00,Other,https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c

@@ -17,7 +17,7 @@ def create_tables():
     conn = connect_db()
     cursor = conn.cursor()
     
-    # 1. Users Table: Added username and password with UNIQUE constraints
+    # 1. Users Table: Stores buyer information
     cursor.execute('''CREATE TABLE IF NOT EXISTS users 
         (id INTEGER PRIMARY KEY AUTOINCREMENT, 
          name TEXT, 
@@ -25,19 +25,24 @@ def create_tables():
          email TEXT UNIQUE, 
          password TEXT)''')
 
-    # 2. Sellers Table: Added password and UNIQUE constraint for store name
+    # 2. Sellers Table: Stores store names and login credentials
     cursor.execute('''CREATE TABLE IF NOT EXISTS sellers 
         (id INTEGER PRIMARY KEY AUTOINCREMENT, 
          store_name TEXT UNIQUE, 
          password TEXT)''')
 
-    # 3. Products Table: Unchanged
+    # 3. Products Table: UPDATED to include 'image_url' column
+    # We add image_url so we can store links to product photos (e.g., from Unsplash)
     cursor.execute('''CREATE TABLE IF NOT EXISTS products 
-        (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price REAL, 
-         category TEXT, seller_id INTEGER, 
+        (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+         name TEXT, 
+         price REAL, 
+         category TEXT, 
+         image_url TEXT, 
+         seller_id INTEGER, 
          FOREIGN KEY(seller_id) REFERENCES sellers(id))''')
 
-    # 4. Orders Table: Unchanged
+    # 4. Orders Table: Stores transaction history
     cursor.execute('''CREATE TABLE IF NOT EXISTS orders 
         (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, 
          total_price REAL, status TEXT,
@@ -46,13 +51,10 @@ def create_tables():
     conn.commit()
     conn.close()
 
-# --- AUTHENTICATION FUNCTIONS (LOGIN) ---
+# --- AUTHENTICATION FUNCTIONS ---
 
 def login_user(username, password):
-    """
-    Authenticates a Buyer using their unique username and password.
-    Returns (id, name) if credentials match.
-    """
+    """Authenticates a Buyer. Returns (id, name) if successful."""
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute("SELECT id, name FROM users WHERE username = ? AND password = ?", (username, password))
@@ -61,10 +63,7 @@ def login_user(username, password):
     return user
 
 def login_seller(store_name, password):
-    """
-    Authenticates a Seller using their store name and password.
-    Returns (id, store_name) if credentials match.
-    """
+    """Authenticates a Seller. Returns (id, store_name) if successful."""
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute("SELECT id, store_name FROM sellers WHERE store_name = ? AND password = ?", (store_name, password))
@@ -75,10 +74,7 @@ def login_seller(store_name, password):
 # --- DATA ENTRY FUNCTIONS (SIGN UP) ---
 
 def add_user(name, username, email, password):
-    """
-    Registers a new Buyer. 
-    Returns True if successful, False if username/email is already taken.
-    """
+    """Registers a new Buyer. Handles duplicate username/email errors."""
     conn = connect_db()
     cursor = conn.cursor()
     try:
@@ -87,16 +83,12 @@ def add_user(name, username, email, password):
         conn.commit()
         return True
     except sqlite3.IntegrityError:
-        # This occurs if a UNIQUE constraint is violated (e.g., duplicate username)
         return False
     finally:
         conn.close()
 
 def add_seller(store_name, password):
-    """
-    Registers a new Seller.
-    Returns True if successful, False if store name is already taken.
-    """
+    """Registers a new Seller store."""
     conn = connect_db()
     cursor = conn.cursor()
     try:
@@ -110,17 +102,21 @@ def add_seller(store_name, password):
 
 # --- BUSINESS LOGIC FUNCTIONS ---
 
-def add_product(name, price, category, seller_id):
-    """Saves a product linked to a specific seller ID."""
+def add_product(name, price, category, image_url, seller_id):
+    """
+    Saves a product to the database.
+    NEW: Now accepts 'image_url' as a parameter to show photos in the marketplace.
+    """
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO products (name, price, category, seller_id) VALUES (?, ?, ?, ?)", 
-                   (name, price, category, seller_id))
+    # Updated SQL to handle 5 values (name, price, category, image_url, seller_id)
+    cursor.execute("INSERT INTO products (name, price, category, image_url, seller_id) VALUES (?, ?, ?, ?, ?)", 
+                   (name, price, category, image_url, seller_id))
     conn.commit()
     conn.close()
 
 def create_order(user_id, total_price):
-    """Records a purchase linked to a specific user ID."""
+    """Records a purchase for a specific user."""
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, ?)", 
