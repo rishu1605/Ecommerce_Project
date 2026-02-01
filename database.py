@@ -1,129 +1,72 @@
 import sqlite3
+import csv
+import os
+from datetime import datetime
+
+DB_NAME = "ecommerce.db"
+UPLOAD_DIR = "uploaded_images"
 
 def connect_db():
-    """
-    Connects to the SQLite database. 
-    'check_same_thread=False' is used to support Streamlit's multi-threaded environment.
-    """
-    conn = sqlite3.connect('ecommerce.db', check_same_thread=False)
-    return conn
+    return sqlite3.connect(DB_NAME, check_same_thread=False)
 
 def create_tables():
-    """
-    Initializes the database schema.
-    Added UNIQUE constraints for usernames and emails to prevent duplicates.
-    Added password columns for security.
-    """
     conn = connect_db()
     cursor = conn.cursor()
+    cursor.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, role TEXT)')
+    cursor.execute('CREATE TABLE IF NOT EXISTS sellers (id INTEGER PRIMARY KEY AUTOINCREMENT, store_name TEXT UNIQUE, balance REAL DEFAULT 0.0)')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        name TEXT, price REAL, category TEXT, 
+        seller_id INTEGER, stock INTEGER, 
+        specs TEXT, images TEXT)''')
+    cursor.execute('CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, buyer_id INTEGER, total REAL, date TEXT, status TEXT DEFAULT "Paid")')
+    cursor.execute('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, method TEXT, status TEXT DEFAULT "Held in Escrow")')
+    conn.commit()
+    conn.close()
+
+def save_images_locally(files, product_name):
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+    paths = []
+    for i, file in enumerate(files):
+        ext = file.name.split('.')[-1]
+        filename = f"{product_name.replace(' ', '_')}_{i}.{ext}"
+        path = os.path.join(UPLOAD_DIR, filename)
+        with open(path, "wb") as f:
+            f.write(file.getbuffer())
+        paths.append(path)
+    return "|".join(paths)
+
+def process_payment(buyer_id, cart, total, method):
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        for pid, item in cart.items():
+            cursor.execute("UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?", (item['qty'], pid, item['qty']))
+            if cursor.rowcount == 0: raise Exception(f"Stock out for {item['name']}")
+        
+        date = datetime.now().strftime("%Y-%m-%d %H:%M")
+        cursor.execute("INSERT INTO orders (buyer_id, total, date) VALUES (?, ?, ?)", (buyer_id, total, date))
+        oid = cursor.lastrowid
+        cursor.execute("INSERT INTO transactions (order_id, method) VALUES (?, ?)", (oid, method))
+        conn.commit()
+        return True, oid
+    except Exception as e:
+        conn.rollback()
+        return False, str(e)
+    finally: conn.close()
+
+def export_csv(table):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM {table}")
+    rows = cursor.fetchall()
+    column_names = [description[0] for description in cursor.description]
     
-    # 1. Users Table: Added username and password with UNIQUE constraints
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users 
-        (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-         name TEXT, 
-         username TEXT UNIQUE, 
-         email TEXT UNIQUE, 
-         password TEXT)''')
-
-    # 2. Sellers Table: Added password and UNIQUE constraint for store name
-    cursor.execute('''CREATE TABLE IF NOT EXISTS sellers 
-        (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-         store_name TEXT UNIQUE, 
-         password TEXT)''')
-
-    # 3. Products Table: Unchanged
-    cursor.execute('''CREATE TABLE IF NOT EXISTS products 
-        (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price REAL, 
-         category TEXT, seller_id INTEGER, 
-         FOREIGN KEY(seller_id) REFERENCES sellers(id))''')
-
-    # 4. Orders Table: Unchanged
-    cursor.execute('''CREATE TABLE IF NOT EXISTS orders 
-        (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, 
-         total_price REAL, status TEXT,
-         FOREIGN KEY(user_id) REFERENCES users(id))''')
-
-    conn.commit()
+    file = f"{table}_data.csv"
+    with open(file, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(column_names)
+        writer.writerows(rows)
     conn.close()
-
-# --- AUTHENTICATION FUNCTIONS (LOGIN) ---
-
-def login_user(username, password):
-    """
-    Authenticates a Buyer using their unique username and password.
-    Returns (id, name) if credentials match.
-    """
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name FROM users WHERE username = ? AND password = ?", (username, password))
-    user = cursor.fetchone()
-    conn.close()
-    return user
-
-def login_seller(store_name, password):
-    """
-    Authenticates a Seller using their store name and password.
-    Returns (id, store_name) if credentials match.
-    """
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, store_name FROM sellers WHERE store_name = ? AND password = ?", (store_name, password))
-    seller = cursor.fetchone()
-    conn.close()
-    return seller
-
-# --- DATA ENTRY FUNCTIONS (SIGN UP) ---
-
-def add_user(name, username, email, password):
-    """
-    Registers a new Buyer. 
-    Returns True if successful, False if username/email is already taken.
-    """
-    conn = connect_db()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)", 
-                       (name, username, email, password))
-        conn.commit()
-        return True
-    except sqlite3.IntegrityError:
-        # This occurs if a UNIQUE constraint is violated (e.g., duplicate username)
-        return False
-    finally:
-        conn.close()
-
-def add_seller(store_name, password):
-    """
-    Registers a new Seller.
-    Returns True if successful, False if store name is already taken.
-    """
-    conn = connect_db()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("INSERT INTO sellers (store_name, password) VALUES (?, ?)", (store_name, password))
-        conn.commit()
-        return True
-    except sqlite3.IntegrityError:
-        return False
-    finally:
-        conn.close()
-
-# --- BUSINESS LOGIC FUNCTIONS ---
-
-def add_product(name, price, category, seller_id):
-    """Saves a product linked to a specific seller ID."""
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO products (name, price, category, seller_id) VALUES (?, ?, ?, ?)", 
-                   (name, price, category, seller_id))
-    conn.commit()
-    conn.close()
-
-def create_order(user_id, total_price):
-    """Records a purchase linked to a specific user ID."""
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, ?)", 
-                   (user_id, total_price, 'Paid'))
-    conn.commit()
-    conn.close()
+    return file

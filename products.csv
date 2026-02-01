@@ -1,0 +1,61 @@
+id,name,category,price,stock,seller_id,specs,images
+1,SIC Pulse ANC Headphones,Electronics,299.0,50,1,*Active Noise Cancellation *40h Battery *Bluetooth 5.3,uploaded_images/Pulse_Front.jpg|uploaded_images/Pulse_Side.jpg|uploaded_images/Pulse_Detail.jpg
+2,SIC Vision 27 4K Monitor,Electronics,349.0,30,1,*4K UHD Resolution *144Hz Refresh *HDR10 Support,uploaded_images/Vision_Front.jpg|uploaded_images/Vision_Side.jpg|uploaded_images/Vision_Detail.jpg
+3,SIC SwiftBook Pro 14,Electronics,1299.0,15,1,*M3 Pro Chip *16GB RAM *512GB SSD,uploaded_images/Swift_Front.jpg|uploaded_images/Swift_Side.jpg|uploaded_images/Swift_Detail.jpg
+4,SIC SmartWatch Ultra,Electronics,199.0,100,1,*GPS Tracking *ECG Monitor *50m Water Resist,uploaded_images/Watch_Front.jpg|uploaded_images/Watch_Side.jpg|uploaded_images/Watch_Detail.jpg
+5,SIC 2TB External SSD,Electronics,150.0,40,1,*USB 3.2 Gen 2 *1050MB/s Speed *Shockproof,uploaded_images/SSD_Front.jpg|uploaded_images/SSD_Side.jpg|uploaded_images/SSD_Detail.jpg
+6,SIC Mech RGB Keyboard,Electronics,89.0,60,1,*Blue Switches *Anti-Ghosting *Aluminum Frame,uploaded_images/KB_Front.jpg|uploaded_images/KB_Side.jpg|uploaded_images/KB_Detail.jpg
+7,SIC 4K Pro Webcam,Electronics,120.0,25,1,*Auto-Focus *Dual Mics *Privacy Shutter,uploaded_images/Cam_Front.jpg|uploaded_images/Cam_Side.jpg|uploaded_images/Cam_Detail.jpg
+8,SIC Wireless Gaming Mouse,Electronics,55.0,80,1,*16000 DPI *6 Buttons *Lightweight,uploaded_images/Mouse_Front.jpg|uploaded_images/Mouse_Side.jpg|uploaded_images/Mouse_Detail.jpg
+9,SIC PowerBank 20k,Electronics,45.0,120,1,*PD Fast Charge *LED Display *Dual Port,uploaded_images/Bank_Front.jpg|uploaded_images/Bank_Side.jpg|uploaded_images/Bank_Detail.jpg
+10,SIC 2.1 SoundBar,Electronics,150.0,20,1,*Wireless Subwoofer *Dolby Digital *Bluetooth,uploaded_images/Sound_Front.jpg|uploaded_images/Sound_Side.jpg|uploaded_images/Sound_Detail.jpg
+11,SIC Organic Arabica,Grocery,18.0,200,1,*1kg Whole Bean *Medium Roast *Fair Trade,uploaded_images/Coffee_Front.jpg|uploaded_images/Coffee_Side.jpg|uploaded_images/Coffee_Detail.jpg
+12,SIC Olive Oil EV,Grocery,25.0,150,1,*500ml Cold Pressed *Italy Origin *Glass,uploaded_images/Oil_Front.jpg|uploaded_images/Oil_Side.jpg|uploaded_images/Oil_Detail.jpg
+13,SIC Pink Salt 2lb,Grocery,12.0,300,1,*Himalayan *Fine Grain *Mineral Rich,uploaded_images/Salt_Front.jpg|uploaded_images/Salt_Side.jpg|uploaded_images/Salt_Detail.jpg
+14,SIC Basmati Rice 5kg,Grocery,22.0,100,1,*Long Grain *Aged 2 Years *Aromatic,uploaded_images/Rice_Front.jpg|uploaded_images/Rice_Side.jpg|uploaded_images/Rice_Detail.jpg
+15,SIC Manuka Honey,Grocery,45.0,80,1,*MGO 400+ *UMF Certified *250g Jar,uploaded_images/Honey_Front.jpg|uploaded_images/Honey_Side.jpg|uploaded_images/Honey_Detail.jpg
+16,SIC Almond Milk 6pk,Grocery,35.0,50,1,*Unsweetened *Vitamin D *Eco-Pack,uploaded_images/Milk_Front.jpg|uploaded_images/Milk_Side.jpg|uploaded_images/Milk_Detail.jpg
+17,SIC Quinoa 1kg,Grocery,15.0,120,1,*Organic *Triple Washed *Gluten-Free,uploaded_images/Quinoa_Front.jpg|uploaded_images/Quinoa_Side.jpg|uploaded_images/Quinoa_Detail.jpg
+18,SIC Dark Choc 70%,Grocery,5.0,500,1,*100g Bar *Sea Salt *Single Origin,uploaded_images/Choc_Front.jpg|uploaded_images/Choc_Side.jpg|uploaded_images/Choc_Detail.jpg
+19,SIC Green Tea 50ct,Grocery,10.0,200,1,*Loose Leaf Bags *Anti-Oxidant *Organic,uploaded_images/Tea_Front.jpg|uploaded_images/Tea_Side.jpg|uploaded_images/Tea_Detail.jpg
+20,SIC Protein Granola,Grocery,9.0,180,1,*500g Pack *Oats & Honey *No Added Sugar,uploaded_images/Granola_Front.jpg|uploaded_images/Granola_Side.jpg|uploaded_images/Granola_Detail.jpg
+21,SIC Men Oxford Shirt,Clothing,40.0,100,1,*100% Cotton *Non-Iron *Slim Fit,uploaded_images/MShirt_Front.jpg|uploaded_images/MShirt_Side.jpg|uploaded_images/MShirt_Detail.jpg
+22,SIC Women Silk Gown,Clothing,120.0,40,1,*Mulberry Silk *A-Line *Evening Red,uploaded_images/WGown_Front.jpg|uploaded_images/WGown_Side.jpg|uploaded_images/WGown_Detail.jpg
+23,SIC Performance Joggers,Clothing,45.0,150,1,*Quick-Dry *Zip Pockets *Elastic Waist,uploaded_images/Joggers_Front.jpg|uploaded_images/Joggers_Side.jpg|uploaded_images/Joggers_Detail.jpg
+24,SIC Women Hoodie,Clothing,55.0,120,1,*Oversized *Fleece Interior *Blue,uploaded_images/Hoodie_Front.jpg|uploaded_images/Hoodie_Side.jpg|uploaded_images/Hoodie_Detail.jpg
+25,SIC Denim Jacket,Clothing,75.0,60,1,*Unisex *Heavyweight Denim *Vintage Wash,uploaded_images/Denim_Front.jpg|uploaded_images/Denim_Side.jpg|uploaded_images/Denim_Detail.jpg
+26,SIC Women Yoga Set,Clothing,60.0,90,1,*Seamless *High-Waist *2-Piece Set,uploaded_images/Yoga_Front.jpg|uploaded_images/Yoga_Side.jpg|uploaded_images/Yoga_Detail.jpg
+27,SIC Slim Fit Blazer,Clothing,85.0,30,1,*Wool Blend *Navy Blue *Formal Cut,uploaded_images/Blazer_Front.jpg|uploaded_images/Blazer_Side.jpg|uploaded_images/Blazer_Detail.jpg
+28,SIC Floral Dress,Clothing,50.0,70,1,*Light Viscose *Summer Print *Knee Length,uploaded_images/Dress_Front.jpg|uploaded_images/Dress_Side.jpg|uploaded_images/Dress_Detail.jpg
+29,SIC Chino Shorts,Clothing,35.0,110,1,*Stretch Cotton *Beige *Classic 9 inch,uploaded_images/Shorts_Front.jpg|uploaded_images/Shorts_Side.jpg|uploaded_images/Shorts_Detail.jpg
+30,SIC Trench Coat,Clothing,110.0,25,1,*Waterproof *Belted *Double Breasted,uploaded_images/Trench_Front.jpg|uploaded_images/Trench_Side.jpg|uploaded_images/Trench_Detail.jpg
+31,SIC Tungsten Band,Jewelry,65.0,200,1,*8mm Width *Scratch Resist *Matte Black,uploaded_images/Ring_Front.jpg|uploaded_images/Ring_Side.jpg|uploaded_images/Ring_Detail.jpg
+32,SIC 18K Gold Pendant,Jewelry,250.0,50,1,*Diamond Accented *18 inch Chain *Yellow Gold,uploaded_images/Pendant_Front.jpg|uploaded_images/Pendant_Side.jpg|uploaded_images/Pendant_Detail.jpg
+33,SIC Leather Bracelet,Jewelry,35.0,150,1,*Genuine Cowhide *Braided *Steel Clasp,uploaded_images/LBrace_Front.jpg|uploaded_images/LBrace_Side.jpg|uploaded_images/LBrace_Detail.jpg
+34,SIC Silver Hoops,Jewelry,50.0,120,1,*925 Sterling *Hypoallergenic *30mm,uploaded_images/Hoops_Front.jpg|uploaded_images/Hoops_Side.jpg|uploaded_images/Hoops_Detail.jpg
+35,SIC Chrono Watch,Jewelry,450.0,20,1,*Sapphire Glass *Leather Strap *10ATM,uploaded_images/LWatch_Front.jpg|uploaded_images/LWatch_Side.jpg|uploaded_images/LWatch_Detail.jpg
+36,SIC Pearl Necklace,Jewelry,180.0,40,1,*Freshwater Pearls *Silver Clasp *White,uploaded_images/Pearl_Front.jpg|uploaded_images/Pearl_Side.jpg|uploaded_images/Pearl_Detail.jpg
+37,SIC Silver Signet,Jewelry,90.0,80,1,*Onyx Inlay *Sterling Silver *Classic,uploaded_images/Signet_Front.jpg|uploaded_images/Signet_Side.jpg|uploaded_images/Signet_Detail.jpg
+38,SIC Tennis Bracelet,Jewelry,210.0,60,1,*CZ Stones *Silver Plated *Box Clasp,uploaded_images/TBrace_Front.jpg|uploaded_images/TBrace_Side.jpg|uploaded_images/TBrace_Detail.jpg
+39,SIC Steel Cufflinks,Jewelry,45.0,100,1,*Brushed Finish *Formal *Gift Box,uploaded_images/Cuffs_Front.jpg|uploaded_images/Cuffs_Side.jpg|uploaded_images/Cuffs_Detail.jpg
+40,SIC Silver Anklet,Jewelry,25.0,200,1,*Adjustable *Heart Charm *925 Silver,uploaded_images/Anklet_Front.jpg|uploaded_images/Anklet_Side.jpg|uploaded_images/Anklet_Detail.jpg
+41,SIC Pro Yoga Mat,Sports,40.0,100,1,*6mm TPE *Non-Slip *Carry Strap,uploaded_images/Mat_Front.jpg|uploaded_images/Mat_Side.jpg|uploaded_images/Mat_Detail.jpg
+42,SIC Carbon Racket,Sports,180.0,30,1,*Tennis Pro *Lightweight *Pre-Strung,uploaded_images/Racket_Front.jpg|uploaded_images/Racket_Side.jpg|uploaded_images/Racket_Detail.jpg
+43,SIC Adj Dumbbells,Sports,120.0,45,1,*5-25kg Dial *Steel Core *Space Saving,uploaded_images/Dumb_Front.jpg|uploaded_images/Dumb_Side.jpg|uploaded_images/Dumb_Detail.jpg
+44,SIC 4-Person Tent,Sports,210.0,25,1,*Waterproof *Ripstop *Quick Setup,uploaded_images/Tent_Front.jpg|uploaded_images/Tent_Side.jpg|uploaded_images/Tent_Detail.jpg
+45,SIC Hydration Pack,Sports,55.0,70,1,*2L Bladder *BPA-Free *Reflective,uploaded_images/HPack_Front.jpg|uploaded_images/HPack_Side.jpg|uploaded_images/HPack_Detail.jpg
+46,SIC Soccer Ball,Sports,25.0,200,1,*Size 5 *Hand-Stitched *FIFA Quality,uploaded_images/Ball_Front.jpg|uploaded_images/Ball_Side.jpg|uploaded_images/Ball_Detail.jpg
+47,SIC Basketball Hoop,Sports,150.0,15,1,*Portable Base *Steel Rim *Adjustable,uploaded_images/Hoop_Front.jpg|uploaded_images/Hoop_Side.jpg|uploaded_images/Hoop_Detail.jpg
+48,SIC Cycling Helmet,Sports,55.0,90,1,*MIPS Safety *LED Rear *Aero Design,uploaded_images/Helmet_Front.jpg|uploaded_images/Helmet_Side.jpg|uploaded_images/Helmet_Detail.jpg
+49,SIC Resistance Bands,Sports,20.0,300,1,*Latex Set *5 Levels *Door Anchor,uploaded_images/Bands_Front.jpg|uploaded_images/Bands_Side.jpg|uploaded_images/Bands_Detail.jpg
+50,SIC Boxing Bag 50lb,Sports,95.0,20,1,*Synthetic Leather *Anti-Burst *Chain,uploaded_images/Box_Front.jpg|uploaded_images/Box_Side.jpg|uploaded_images/Box_Detail.jpg
+51,SIC Soap Dispenser,Health,30.0,150,1,*Infrared Sensor *Touchless *Waterproof,uploaded_images/Soap_Front.jpg|uploaded_images/Soap_Side.jpg|uploaded_images/Soap_Detail.jpg
+52,SIC HEPA Purifier,Health,190.0,30,1,*3-Stage Filter *CADR 250 *Silent Mode,uploaded_images/Purifier_Front.jpg|uploaded_images/Purifier_Side.jpg|uploaded_images/Purifier_Detail.jpg
+53,SIC Bamboo Tissues,Health,20.0,200,1,*12-Pack 3-Ply *Biodegradable *Soft,uploaded_images/Tissues_Front.jpg|uploaded_images/Tissues_Side.jpg|uploaded_images/Tissues_Detail.jpg
+54,SIC Sonic Brush,Health,75.0,100,1,*40k VPM *5 Modes *3 Heads,uploaded_images/Brush_Front.jpg|uploaded_images/Brush_Side.jpg|uploaded_images/Brush_Detail.jpg
+55,SIC Disinfectant 1L,Health,15.0,400,1,*Kills 99.9% *Lemon Scent *Bleach-Free,uploaded_images/Dis_Front.jpg|uploaded_images/Dis_Side.jpg|uploaded_images/Dis_Detail.jpg
+56,SIC First Aid 100pc,Health,45.0,120,1,*ANSI Compliant *Hard Case *Full Kit,uploaded_images/First_Front.jpg|uploaded_images/First_Side.jpg|uploaded_images/First_Detail.jpg
+57,SIC Digital Thermo,Health,25.0,250,1,*Contactless *1s Reading *Fever Alarm,uploaded_images/Thermo_Front.jpg|uploaded_images/Thermo_Side.jpg|uploaded_images/Thermo_Detail.jpg
+58,SIC Face Masks 50pk,Health,15.0,1000,1,*3-Layer *Breathable *Comfort Ear,uploaded_images/Masks_Front.jpg|uploaded_images/Masks_Side.jpg|uploaded_images/Masks_Detail.jpg
+59,SIC Vitamin C 90ct,Health,18.0,300,1,*Gummies *Immune Boost *Vegan,uploaded_images/Vit_Front.jpg|uploaded_images/Vit_Side.jpg|uploaded_images/Vit_Detail.jpg
+60,SIC UV Sterilizer,Health,50.0,60,1,*UVC Light *Phone Charge *99% Kill,uploaded_images/UV_Front.jpg|uploaded_images/UV_Side.jpg|uploaded_images/UV_Detail.jpg
