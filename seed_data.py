@@ -41,4 +41,6 @@ def seed_from_csv():
         conn.close()
 
 if __name__ == "__main__":
+
     seed_from_csv()
+    #jfdykfibfkgiufpfruo
