@@ -1,39 +1,49 @@
 import sqlite3
 import pandas as pd
 
-DB_PATH = 'sic_mart.db'
+DB_PATH = "sic_mart.db"
 
+# -------------------- CONNECTION --------------------
 def get_connection():
     return sqlite3.connect(DB_PATH)
 
+# -------------------- TABLE SETUP --------------------
 def set_up_tables():
     with get_connection() as conn:
         cursor = conn.cursor()
-        
-        # 1. Users Table (Ensuring all profile fields exist)
-        cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+
+        # 1. USERS
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT, 
-            email TEXT UNIQUE, 
-            password TEXT, 
+            name TEXT,
+            email TEXT UNIQUE,
+            password TEXT,
             role TEXT,
             address TEXT,
             upi_id TEXT,
             bank_acc TEXT,
             ifsc TEXT,
             acc_holder TEXT,
-            branch TEXT)''')
+            branch TEXT
+        )
+        """)
 
-        # 2. Seller Profiles
-        cursor.execute('''CREATE TABLE IF NOT EXISTS seller_profiles (
-            seller_id INTEGER PRIMARY KEY, 
-            store_name TEXT, 
-            gst_number TEXT, 
-            pan_number TEXT, 
-            status TEXT DEFAULT 'Pending')''')
+        # 2. SELLER PROFILES
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS seller_profiles (
+            seller_id INTEGER PRIMARY KEY,
+            store_name TEXT,
+            gst_number TEXT,
+            pan_number TEXT,
+            status TEXT DEFAULT 'Pending',
+            FOREIGN KEY (seller_id) REFERENCES users(user_id)
+        )
+        """)
 
-        # Inside your table setup function in database.py
-        cursor.execute('''CREATE TABLE IF NOT EXISTS products (
+        # 3. PRODUCTS (Updated with status and is_approved)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
             product_id INTEGER PRIMARY KEY AUTOINCREMENT,
             seller_id INTEGER,
             name TEXT NOT NULL,
@@ -41,66 +51,67 @@ def set_up_tables():
             price REAL NOT NULL,
             stock INTEGER NOT NULL,
             description TEXT,
-            image_url TEXT, -- This will store "url1|url2|url3"
+            image_url TEXT,
+            status TEXT DEFAULT 'active',
+            is_approved INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (seller_id) REFERENCES users(user_id))''')
+            FOREIGN KEY (seller_id) REFERENCES users(user_id)
+        )
+        """)
 
-        # 4. Wallets
-        cursor.execute('''CREATE TABLE IF NOT EXISTS wallets (
-            user_id INTEGER PRIMARY KEY, 
-            balance REAL DEFAULT 0.0)''')
-        
-        # 5. Orders
-        cursor.execute('''CREATE TABLE IF NOT EXISTS orders (
-            order_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        # 4. WALLETS
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS wallets (
+            user_id INTEGER PRIMARY KEY,
+            balance REAL DEFAULT 0.0,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+        """)
+
+        # 5. ORDERS
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
             buyer_id INTEGER,
-            seller_id INTEGER, 
-            product_name TEXT, 
-            amount REAL, 
-            status TEXT DEFAULT 'Confirmed', 
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+            seller_id INTEGER,
+            product_name TEXT,
+            amount REAL,
+            status TEXT DEFAULT 'Confirmed',
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (buyer_id) REFERENCES users(user_id),
+            FOREIGN KEY (seller_id) REFERENCES users(user_id)
+        )
+        """)
 
-        # 6. Payments
-        cursor.execute('''CREATE TABLE IF NOT EXISTS payments (
+        # 6. PAYMENTS
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS payments (
             payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_id INTEGER,
             user_id INTEGER,
             amount REAL,
-            type TEXT, 
+            type TEXT,
             status TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-        
-        conn.commit()
-    
-    # Run migrations to fix existing databases
-    migrate_columns()
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+        """)
 
-def migrate_columns():
-    """Adds missing columns to the users table if they don't exist."""
-    new_cols = [
-        ('address', 'TEXT'),
-        ('upi_id', 'TEXT'),
-        ('bank_acc', 'TEXT'),
-        ('ifsc', 'TEXT'),
-        ('acc_holder', 'TEXT'),
-        ('branch', 'TEXT')
-    ]
-    
-    with get_connection() as conn:
-        cursor = conn.cursor()
-        # Get existing columns
-        cursor.execute("PRAGMA table_info(users)")
-        existing_cols = [col[1] for col in cursor.fetchall()]
-        
-        for col_name, col_type in new_cols:
-            if col_name not in existing_cols:
-                try:
-                    cursor.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
-                    print(f"Migration: Added column {col_name} to users table.")
-                except Exception as e:
-                    print(f"Migration Error on {col_name}: {e}")
+        # 7. CART (NEW TABLE ADDED HERE)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS cart (
+            cart_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            buyer_id INTEGER,
+            product_id INTEGER,
+            quantity INTEGER DEFAULT 1,
+            FOREIGN KEY (buyer_id) REFERENCES users(user_id),
+            FOREIGN KEY (product_id) REFERENCES products(product_id)
+        )
+        """)
+
         conn.commit()
 
+# -------------------- QUERY HELPERS --------------------
 def execute_query(query, params=None):
     with get_connection() as conn:
         cursor = conn.cursor()

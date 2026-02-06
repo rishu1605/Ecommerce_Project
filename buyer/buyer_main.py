@@ -1,12 +1,11 @@
 import streamlit as st
 
-# Import the UI components
+# 1. Update your imports (Uncomment the marketplace UI)
 from buyer.auth.auth_ui import render_buyer_auth
 from buyer.orders.orders_ui import render_order_history
 from buyer.wallet.wallet_ui import render_wallet_ui
 from buyer.profile.profile_ui import render_buyer_profile
-# from buyer.home.home_ui import render_marketplace  # Uncomment when home_ui is ready
-# from buyer.cart.cart_ui import render_cart_ui      # Uncomment when cart_ui is ready
+from buyer.home.home_ui import render_marketplace  # UNCOMMENTED THIS
 
 def run_buyer_ui():
     # 1. Authentication Check
@@ -16,7 +15,6 @@ def run_buyer_ui():
         # 2. Sidebar Navigation
         st.sidebar.title("🛍️ Buyer Panel")
         
-        # Display User Name and Balance in Sidebar for convenience
         user_name = st.session_state.user_data.get('name', 'User')
         st.sidebar.write(f"Welcome, **{user_name}**")
         
@@ -36,24 +34,23 @@ def run_buyer_ui():
             st.session_state.clear()
             st.rerun()
 
-        # 3. Routing Logic (The Handshake)
+        # 3. Routing Logic (THE FIX IS HERE)
         if menu == "🏠 Home":
             st.title("🏙️ Marketplace")
-            st.info("Browsing all available products...")
-            # render_marketplace() 
+            # CALL THE ACTUAL UI COMPONENT
+            render_marketplace() 
 
         elif menu == "📦 My Orders":
             render_order_history()
 
         elif menu == "🛒 Cart":
             st.title("🛒 Your Shopping Cart")
-            # render_cart_ui()
+            # render_cart_ui() # Uncomment this once your cart_ui file is created
 
         elif menu == "👛 Wallet":
             render_wallet_ui()
 
         elif menu == "👤 My Profile":
-            # This was the missing part! Calling the actual function.
             render_buyer_profile()
 
         elif menu == "📞 Support":
