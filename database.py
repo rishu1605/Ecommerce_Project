@@ -32,16 +32,18 @@ def set_up_tables():
             pan_number TEXT, 
             status TEXT DEFAULT 'Pending')''')
 
-        # 3. Products
+        # Inside your table setup function in database.py
         cursor.execute('''CREATE TABLE IF NOT EXISTS products (
-            product_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            product_id INTEGER PRIMARY KEY AUTOINCREMENT,
             seller_id INTEGER,
-            name TEXT, 
-            price REAL, 
-            stock INTEGER, 
-            description TEXT, 
-            category TEXT, 
-            image_url TEXT)''')
+            name TEXT NOT NULL,
+            category TEXT NOT NULL,
+            price REAL NOT NULL,
+            stock INTEGER NOT NULL,
+            description TEXT,
+            image_url TEXT, -- This will store "url1|url2|url3"
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (seller_id) REFERENCES users(user_id))''')
 
         # 4. Wallets
         cursor.execute('''CREATE TABLE IF NOT EXISTS wallets (

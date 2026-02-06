@@ -2,28 +2,32 @@ import streamlit as st
 import cloudinary
 import cloudinary.uploader
 
-# Configuration for Cloudinary
-# For Unsigned uploads, we mainly need the Cloud Name
+# Configuration logic mapping to your specific secrets.toml keys
 try:
     cloudinary.config(
-        cloud_name = st.secrets["cloudinary"]["cloud_name"],
-        api_key = st.secrets["cloudinary"]["api_key"],
+        cloud_name = st.secrets["CLOUDINARY_NAME"],
+        api_key = st.secrets["CLOUDINARY_KEY"],
+        api_secret = st.secrets["CLOUDINARY_SECRET"],
         secure = True
     )
-except:
-    # Manual fallback for test.py
-    cloudinary.config(cloud_name="your_cloud_name", secure=True)
+except Exception:
+    # Manual Fallback using your verified credentials
+    cloudinary.config(
+        cloud_name = "drvwqubls",
+        api_key = "875357953927593",
+        api_secret = "3OV41fTxgjADdj-6Ln4N1Dbcljk",
+        secure = True
+    )
 
-def upload_image_to_cloud(image_file):
-    """Performs an UNSIGNED upload using your 'ml_default' preset."""
+def upload_to_cloudinary(image_file):
+    """Performs an UNSIGNED upload using the ml_default preset."""
     try:
-        # We use unsigned_upload and specify the preset name
         response = cloudinary.uploader.unsigned_upload(
             image_file, 
-            upload_preset="ml_default", # Ensure this matches your Cloudinary dashboard
+            upload_preset="ml_default", 
             folder="sic_mart_products"
         )
         return response.get("secure_url")
     except Exception as e:
-        print(f"Cloudinary Unsigned Upload Error: {e}")
+        st.error(f"Cloudinary Error: {e}")
         return None
