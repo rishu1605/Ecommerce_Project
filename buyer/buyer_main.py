@@ -11,29 +11,17 @@ def run_buyer_ui():
         render_buyer_auth()
         return
 
-    # --- FEATURE: Buy Now Priority Redirect ---
-    if st.session_state.get("buy_now_active"):
-        render_buy_now_payment()
-        return
-
-    # --- ORIGINAL FEATURE: Sidebar Navigation ---
     st.sidebar.title("🛍️ Buyer Panel")
-    user_name = st.session_state.user_data.get('name', 'User')
-    st.sidebar.write(f"Welcome, **{user_name}**")
-    st.sidebar.markdown("---")
-    
-    menu = st.sidebar.radio("Navigation", [
-        "🏠 Home", "📦 My Orders", "🛒 Cart", "👛 Wallet", "👤 My Profile", "📞 Support"
-    ])
-    
-    st.sidebar.markdown("---")
-    if st.sidebar.button("🔓 Logout", use_container_width=True):
-        st.session_state.clear()
-        st.rerun()
+    menu = st.sidebar.radio("Navigation", ["🏠 Home", "📦 My Orders", "🛒 Cart", "👛 Wallet", "👤 My Profile", "📞 Support"])
 
-    # --- FEATURE: Page Routing ---
-    if menu == "🏠 Home":
-        st.title("🏙️ Marketplace")
+    # Safety: Reset Buy Now if switching pages
+    if menu != "🏠 Home":
+        st.session_state.buy_now_active = False
+
+    # Route to Buy Now if active
+    if st.session_state.get("buy_now_active") and menu == "🏠 Home":
+        render_buy_now_payment()
+    elif menu == "🏠 Home":
         render_marketplace() 
     elif menu == "📦 My Orders":
         render_order_history()
@@ -44,10 +32,9 @@ def run_buyer_ui():
     elif menu == "👤 My Profile":
         render_buyer_profile()
     elif menu == "📞 Support":
-        st.title("📞 Contact Support")
-        # Restored your support message box feature
-        with st.container(border=True):
-            st.write("📧 Email: support@sicmart.com")
-            st.text_area("Drop us a message")
-            if st.button("Send Message"):
-                st.success("Ticket raised!")
+        st.title("📞 Support")
+        st.write("📧 support@sicmart.com")
+
+    if st.sidebar.button("🔓 Logout"):
+        st.session_state.clear()
+        st.rerun()

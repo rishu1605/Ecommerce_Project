@@ -4,7 +4,6 @@ import os
 import pandas as pd
 from buyer.cart.cart_backend import get_cart_items, remove_from_cart, get_cart_total, clear_cart
 
-# --- ORIGINAL FEATURE: Standard Cart UI ---
 def render_cart_ui():
     st.title("🛒 Your Shopping Cart")
     user_id = st.session_state.user_data['user_id']
@@ -21,10 +20,11 @@ def render_cart_ui():
             col_img, col_info, col_del = st.columns([1.2, 2.5, 0.5])
             with col_img:
                 raw_img = item.get('image_url', "").split("|")[0]
-                if raw_img: st.image(raw_img, use_container_width=True)
+                if raw_img and str(raw_img) != 'nan':
+                    st.image(raw_img, use_container_width=True)
             with col_info:
                 st.subheader(item['name'])
-                st.write(f"₹{item['price']:,} x {item['quantity']}")
+                st.write(f"**Price:** ₹{item['price']:,} | **Qty:** {item['quantity']}")
             with col_del:
                 if st.button("❌", key=f"del_{item['cart_id']}"):
                     remove_from_cart(item['cart_id'])
@@ -33,14 +33,15 @@ def render_cart_ui():
     st.markdown("---")
     process_checkout(total_amt, cart_items, user_id)
 
-# --- NEW FEATURE: Express Buy Now UI ---
 def render_buy_now_payment():
     st.title("⚡ Express Checkout")
-    if st.button("⬅️ Cancel"):
+    if st.button("⬅️ Back to Marketplace"):
         st.session_state.buy_now_active = False
         st.rerun()
 
     item = st.session_state.get("buy_now_item")
+    user_id = st.session_state.user_data['user_id']
+
     if item:
         with st.container(border=True):
             c1, c2 = st.columns([1, 2])
@@ -49,48 +50,50 @@ def render_buy_now_payment():
                 if img: st.image(img, use_container_width=True)
             with c2:
                 st.subheader(item['name'])
-                st.write(f"**Total Amount: ₹{item['price']:,}**")
-        
+                st.write(f"### **Total: ₹{item['price']:,}**")
+
         temp_df = pd.DataFrame([item])
-        process_checkout(item['price'], temp_df, st.session_state.user_data['user_id'])
+        process_checkout(item['price'], temp_df, user_id)
 
-# --- REUSED FEATURE: Payment Processing & Wallet Validation ---
-def process_checkout(total_amt, items, user_id):
-    st.write("### 💳 Select Payment Method")
-    pay_method = st.radio("Gateway:", ["👛 Sapphire Wallet", "📱 UPI", "💳 Card"], key="pay_gate")
-    
-    if pay_method == "👛 Sapphire Wallet":
-        wallet = db.fetch_query("SELECT balance FROM wallets WHERE user_id=?", (user_id,))
-        balance = wallet['balance'][0] if not wallet.empty else 0
-        st.info(f"Balance: ₹{balance:,}")
-        if balance < total_amt: st.warning("Insufficient funds.")
+def process_checkout(total_amt, items_df, user_id):
+    st.write("### 💳 Payment Details")
+    method = st.radio("Method:", ["👛 Sapphire Wallet", "📱 UPI", "💳 Card", "🏦 Net Banking", "💵 Cash on Delivery"], key="pay_method")
 
-    if st.button("Confirm Payment", use_container_width=True, type="primary"):
-        if pay_method == "👛 Sapphire Wallet":
-            # Re-check balance at the moment of click
+    with st.container(border=True):
+        if method == "👛 Sapphire Wallet":
             wallet = db.fetch_query("SELECT balance FROM wallets WHERE user_id=?", (user_id,))
-            balance = wallet['balance'][0] if not wallet.empty else 0
-            if balance < total_amt:
+            bal = wallet['balance'][0] if not wallet.empty else 0
+            st.info(f"Balance: ₹{bal:,}")
+        elif method == "📱 UPI":
+            st.text_input("UPI ID", placeholder="user@bank")
+        elif method == "💳 Card":
+            st.text_input("Card Number", max_chars=16)
+            c1, c2 = st.columns(2)
+            c1.text_input("Expiry (MM/YY)")
+            c2.text_input("CVV", type="password")
+        elif method == "🏦 Net Banking":
+            st.selectbox("Select Bank", ["SBI", "HDFC", "ICICI", "Axis"])
+        elif method == "💵 Cash on Delivery":
+            st.write("Pay at your doorstep.")
+
+    if st.button("Complete Payment", use_container_width=True, type="primary"):
+        if method == "👛 Sapphire Wallet":
+            wallet = db.fetch_query("SELECT balance FROM wallets WHERE user_id=?", (user_id,))
+            bal = wallet['balance'][0] if not wallet.empty else 0
+            if bal < total_amt:
                 st.error("Low Balance!")
                 return
             db.execute_query("UPDATE wallets SET balance = balance - ? WHERE user_id = ?", (total_amt, user_id))
         
-        finalize_order(user_id, items)
+        finalize_order(user_id, items_df)
 
-def finalize_order(user_id, items):
+def finalize_order(user_id, items_df):
     try:
-        for _, item in items.iterrows():
-            db.execute_query(
-                "INSERT INTO orders (buyer_id, product_name, amount, status) VALUES (?, ?, ?, 'Confirmed')",
-                (user_id, item['name'], item['price'] * item.get('quantity', 1))
-            )
-        
-        if st.session_state.get("buy_now_active"):
-            st.session_state.buy_now_active = False
-            st.session_state.buy_now_item = None
-        else:
-            clear_cart(user_id)
-            
+        for _, item in items_df.iterrows():
+            db.execute_query("INSERT INTO orders (buyer_id, product_name, amount, status) VALUES (?, ?, ?, 'Confirmed')",
+                             (user_id, item['name'], item['price'] * item.get('quantity', 1)))
+        st.session_state.buy_now_active = False
+        if not st.session_state.get("buy_now_item"): clear_cart(user_id)
         st.success("🎉 Order Placed!")
         st.balloons()
         st.rerun()
