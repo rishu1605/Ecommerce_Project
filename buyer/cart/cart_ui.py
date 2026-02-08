@@ -55,7 +55,8 @@ def render_buy_now_payment():
     item = st.session_state.get("buy_now_item")
     user_id = st.session_state.user_data['user_id']
 
-    if item:
+    if item is not None and not item.empty:
+   
         temp_df = pd.DataFrame([item])
         if 'quantity' not in temp_df.columns:
             temp_df['quantity'] = 1
