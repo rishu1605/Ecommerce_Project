@@ -1,19 +1,30 @@
 import streamlit as st
 import database as db
 from seller.auth.auth_ui import render_seller_auth
-# Import your UI modules here
-from seller.inventory.inventory_ui import show_inventory_listing
+
+# Fixed Imports: Removed duplicates and consolidated
+from seller.inventory.inventory_ui import show_inventory_listing, render_inventory_management
+from seller.dashboard.dashboard_ui import render_seller_dashboard
+from seller.profile.profile_ui import render_seller_profile # Matches the function in your profile_ui.py
 
 def run_seller_ui():
+    # 1. Authentication Check
     if not st.session_state.get("logged_in") or st.session_state.get("role") != "seller":
         render_seller_auth()
     else:
-        # Check approval status from database
-        seller_id = st.session_state.user_data['user_id']
+        # 2. Extract and Normalize ID
+        # Ensuring both 'user_id' and 'id' keys are available to prevent KeyError
+        user_data = st.session_state.user_data
+        seller_id = user_data.get('user_id') or user_data.get('id')
+        
+        # Inject 'id' into session_state because your render_seller_profile() requires it
+        st.session_state.user_data['id'] = seller_id 
+
+        # 3. Fetch Approval status from database
         profile = db.fetch_query("SELECT status FROM seller_profiles WHERE seller_id=?", (seller_id,))
         status = profile['status'][0] if not profile.empty else "Unregistered"
 
-        # Sidebar Navigation
+        # 4. Sidebar Navigation
         st.sidebar.title("🏪 Seller Studio")
         
         # Display Status with Color Coding
@@ -26,33 +37,31 @@ def run_seller_ui():
             "📊 Dashboard", "📦 Inventory", "📑 Shop Orders", "👤 Profile", "📞 Support"
         ])
 
-        if st.sidebar.button("Logout"):
+        if st.sidebar.button("Logout", use_container_width=True):
             st.session_state.clear()
             st.rerun()
 
-        # Content Routing Logic
+        # 5. Content Routing Logic
         if menu == "📊 Dashboard":
-            st.subheader("Seller Performance Overview")
-            # Call your dashboard function here
+            render_seller_dashboard()
 
         elif menu == "📦 Inventory":
             if status != "Approved":
                 st.error("🚨 Access Denied: Your account must be 'Approved' by an Admin to list products.")
             else:
-                # This calls the listing form we built
-                show_inventory_listing()
+                tab1, tab2 = st.tabs(["➕ List New Item", "🛠️ Manage Existing Inventory"])
+                with tab1:
+                    show_inventory_listing()
+                with tab2:
+                    render_inventory_management()
 
         elif menu == "📑 Shop Orders":
             st.subheader("Order Management")
-            # from seller.sales.sales_ui import show_orders
-            # show_orders()
+            # Integration point for order fulfillment
 
         elif menu == "👤 Profile":
-            st.subheader("Business Profile")
-            # from seller.profile.profile_ui import show_seller_profile
-            # show_seller_profile()
+            # Calling the specific function defined in your profile_ui.py
+            render_seller_profile() 
 
         elif menu == "📞 Support":
             st.subheader("Seller Support Center")
-            # from seller.support.support_ui import show_seller_support
-            # show_seller_support()
