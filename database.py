@@ -20,7 +20,7 @@ def set_up_tables():
             email TEXT UNIQUE,
             password TEXT,
             role TEXT,
-            address TEXT,
+            address TEXT, -- Main profile address
             upi_id TEXT,
             bank_acc TEXT,
             ifsc TEXT,
@@ -29,7 +29,20 @@ def set_up_tables():
         )
         """)
 
-        # 2. SELLER PROFILES
+        # 2. ADDRESSES (NEW: Stores multiple addresses per user)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS addresses (
+            address_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            label TEXT, -- e.g., 'Home', 'Office', 'Other'
+            address_text TEXT NOT NULL,
+            is_default INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+        """)
+
+        # 3. SELLER PROFILES
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS seller_profiles (
             seller_id INTEGER PRIMARY KEY,
@@ -41,7 +54,7 @@ def set_up_tables():
         )
         """)
 
-        # 3. PRODUCTS (Updated with status and is_approved)
+        # 4. PRODUCTS
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS products (
             product_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +72,7 @@ def set_up_tables():
         )
         """)
 
-        # 4. WALLETS
+        # 5. WALLETS
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS wallets (
             user_id INTEGER PRIMARY KEY,
@@ -68,7 +81,20 @@ def set_up_tables():
         )
         """)
 
-        # 5. ORDERS
+        # 6. TRANSACTIONS
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            amount REAL,
+            status TEXT,
+            order_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+        """)
+
+        # 7. ORDERS (Updated to include shipping_address)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             order_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,6 +102,7 @@ def set_up_tables():
             seller_id INTEGER,
             product_name TEXT,
             amount REAL,
+            shipping_address TEXT, -- Captured at checkout
             status TEXT DEFAULT 'Confirmed',
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (buyer_id) REFERENCES users(user_id),
@@ -83,7 +110,7 @@ def set_up_tables():
         )
         """)
 
-        # 6. PAYMENTS
+        # 8. PAYMENTS
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS payments (
             payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,7 +124,7 @@ def set_up_tables():
         )
         """)
 
-        # 7. CART (NEW TABLE ADDED HERE)
+        # 9. CART
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS cart (
             cart_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,3 +148,7 @@ def execute_query(query, params=None):
 def fetch_query(query, params=None):
     with get_connection() as conn:
         return pd.read_sql_query(query, conn, params=params)
+
+if __name__ == "__main__":
+    set_up_tables()
+    print("Database tables synchronized successfully!")

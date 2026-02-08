@@ -1,44 +1,77 @@
-import database as db
 import pandas as pd
+import database as db
+from datetime import datetime
 
-def get_wallet_data(buyer_id):
-    """Fetches current balance from the wallets table and transaction history from orders."""
-    
-    # 1. Fetch Balance from the 'wallets' table (NOT users)
-    balance_df = db.fetch_query("SELECT balance FROM wallets WHERE user_id = ?", (buyer_id,))
-    
-    if not balance_df.empty:
-        balance = float(balance_df.iloc[0]['balance'])
-    else:
-        # If no wallet exists, create one with 0 balance
-        db.execute_query("INSERT INTO wallets (user_id, balance) VALUES (?, 0.0)", (buyer_id,))
-        balance = 0.0
-
-    # 2. Fetch Transaction History
-    # Note: We use the 'orders' table as the source of truth for transactions
-    history = db.fetch_query("""
-        SELECT order_id, amount, status, date as created_at 
-        FROM orders 
-        WHERE buyer_id = ?
-        ORDER BY date DESC
-    """, (buyer_id,))
-    
-    return balance, history
-
-def top_up_wallet(buyer_id, amount):
-    """Updates the balance in the wallets table."""
+def get_wallet_data(user_id):
+    """
+    Fetches the current balance and transaction history for a specific user.
+    Ensures a wallet exists for the user before fetching.
+    """
     try:
-        # Check if wallet exists first
-        check = db.fetch_query("SELECT user_id FROM wallets WHERE user_id = ?", (buyer_id,))
+        # 1. ENSURE WALLET EXISTS (Safety First)
+        # We check if a wallet exists; if not, we create it.
+        check_query = "SELECT balance FROM wallets WHERE user_id = ?"
+        balance_df = db.fetch_query(check_query, (user_id,))
         
-        if check.empty:
-            db.execute_query("INSERT INTO wallets (user_id, balance) VALUES (?, ?)", (buyer_id, amount))
+        if balance_df.empty:
+            db.execute_query("INSERT INTO wallets (user_id, balance) VALUES (?, 0.0)", (user_id,))
+            balance = 0.0
         else:
-            db.execute_query("""
-                UPDATE wallets SET balance = balance + ? 
-                WHERE user_id = ?
-            """, (amount, buyer_id))
-        return True
+            balance = float(balance_df.iloc[0]['balance'])
+
+        # 2. Fetch Transaction History
+        history_query = """
+            SELECT amount, status, order_id, created_at 
+            FROM transactions 
+            WHERE user_id = ? 
+            ORDER BY created_at DESC
+        """
+        history = db.fetch_query(history_query, (user_id,))
+        
+        return balance, history
+
     except Exception as e:
-        print(f"Wallet Update Error: {e}")
+        print(f"❌ Error fetching wallet data: {e}")
+        return 0.0, pd.DataFrame()
+
+def top_up_wallet(user_id, amount):
+    """
+    Updates the wallet balance and logs the transaction.
+    Includes a debug print to capture exactly why a payment might fail.
+    """
+    if amount <= 0:
+        return False
+
+    try:
+        # Step A: Double-check if wallet exists (prevents UPDATE failing on 0 rows)
+        check_query = "SELECT 1 FROM wallets WHERE user_id = ?"
+        exists = db.fetch_query(check_query, (user_id,))
+        
+        if exists.empty:
+            db.execute_query("INSERT INTO wallets (user_id, balance) VALUES (?, 0.0)", (user_id,))
+
+        # Step B: Update the balance
+        update_balance_query = "UPDATE wallets SET balance = balance + ? WHERE user_id = ?"
+        db.execute_query(update_balance_query, (amount, user_id))
+
+        # Step C: Log the transaction
+        log_transaction_query = """
+            INSERT INTO transactions (user_id, amount, status, order_id, created_at) 
+            VALUES (?, ?, ?, ?, ?)
+        """
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        db.execute_query(log_transaction_query, (
+            user_id, 
+            float(amount), 
+            'completed', 
+            'TOPUP', 
+            timestamp
+        ))
+
+        print(f"✅ Success: ₹{amount} added to User {user_id}")
+        return True
+
+    except Exception as e:
+        # THIS PRINT IS CRITICAL: Look at your VS Code terminal to see the real error
+        print(f"⚠️ DATABASE ERROR during top-up: {e}")
         return False
