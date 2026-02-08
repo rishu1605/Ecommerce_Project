@@ -56,8 +56,12 @@ def render_buy_now_payment():
     user_id = st.session_state.user_data['user_id']
 
     if item is not None and not item.empty:
-   
-        temp_df = pd.DataFrame([item])
+        # Ensure item is treated as a row
+        if isinstance(item, pd.Series):
+            temp_df = pd.DataFrame([item])
+        else:
+            temp_df = item
+
         if 'quantity' not in temp_df.columns:
             temp_df['quantity'] = 1
             
@@ -201,12 +205,26 @@ def finalize_order(user_id, items_df, final_total, address):
                    VALUES (?, ?, ?, ?, 'Confirmed', ?)""",
                 (user_id, item['name'], item['price'] * item.get('quantity', 1), address, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
-        st.session_state.buy_now_active = False
-        if not st.session_state.get("buy_now_item"): 
+        
+        # --- FIXED TRUTH VALUE ERROR HERE ---
+        bn_item = st.session_state.get("buy_now_item")
+        
+        # Check if buy_now_item is None or Empty without causing ambiguity
+        is_buy_now_empty = True
+        if bn_item is not None:
+            if isinstance(bn_item, (pd.DataFrame, pd.Series)):
+                is_buy_now_empty = bn_item.empty
+            else:
+                is_buy_now_empty = False
+
+        if is_buy_now_empty: 
             clear_cart(user_id)
         else:
             st.session_state.buy_now_item = None
-            
+        
+        st.session_state.buy_now_active = False
+        # ------------------------------------
+
         st.success(f"🎉 Order of ₹{final_total:,.2f} confirmed!")
         st.balloons()
         time.sleep(2)

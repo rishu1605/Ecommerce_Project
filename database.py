@@ -135,6 +135,18 @@ def set_up_tables():
             FOREIGN KEY (product_id) REFERENCES products(product_id)
         )
         """)
+        # 10. TICKETS (Add this block to fix your error)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tickets (
+            ticket_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            subject TEXT,
+            issue TEXT,
+            status TEXT DEFAULT 'Open',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+        """)
 
         conn.commit()
 
