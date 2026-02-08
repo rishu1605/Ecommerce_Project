@@ -20,7 +20,7 @@ def set_up_tables():
             email TEXT UNIQUE,
             password TEXT,
             role TEXT,
-            address TEXT, -- Main profile address
+            address TEXT,
             upi_id TEXT,
             bank_acc TEXT,
             ifsc TEXT,
@@ -29,12 +29,12 @@ def set_up_tables():
         )
         """)
 
-        # 2. ADDRESSES (NEW: Stores multiple addresses per user)
+        # 2. ADDRESSES (Stores multiple addresses per user)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS addresses (
             address_id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
-            label TEXT, -- e.g., 'Home', 'Office', 'Other'
+            label TEXT,
             address_text TEXT NOT NULL,
             is_default INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -94,7 +94,7 @@ def set_up_tables():
         )
         """)
 
-        # 7. ORDERS (Updated to include shipping_address)
+        # 7. ORDERS
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             order_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,7 +102,7 @@ def set_up_tables():
             seller_id INTEGER,
             product_name TEXT,
             amount REAL,
-            shipping_address TEXT, -- Captured at checkout
+            shipping_address TEXT,
             status TEXT DEFAULT 'Confirmed',
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (buyer_id) REFERENCES users(user_id),
@@ -124,7 +124,7 @@ def set_up_tables():
         )
         """)
 
-        # 9. CART
+        # 9. CART (Ensuring buyer_id matches your Backend logic)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS cart (
             cart_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,6 +149,8 @@ def fetch_query(query, params=None):
     with get_connection() as conn:
         return pd.read_sql_query(query, conn, params=params)
 
+# Auto-run setup on import
+set_up_tables()
+
 if __name__ == "__main__":
-    set_up_tables()
     print("Database tables synchronized successfully!")

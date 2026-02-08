@@ -8,7 +8,14 @@ from seller.seller_main import run_seller_ui
 from admin.admin_main import run_admin_ui
 
 def main():
-    st.set_page_config(page_title="SIC Mart | Marketplace", layout="wide", page_icon="🛒")
+    # --- UPDATED BRANDING ---
+    st.set_page_config(
+        page_title="SIC Mart | Smart • Instant • Choice", 
+        layout="wide", 
+        page_icon="🛒"
+    )
+    
+    # Apply the custom CSS/Themes
     apply_custom_theme()
 
     # Initialize Database Schema
@@ -20,11 +27,13 @@ def main():
     query_params = st.query_params
     current_page = query_params.get("page", "buyer")
 
+    # --- PORTAL ROUTING ---
     if current_page == "admin":
         run_admin_ui()
     elif current_page == "seller":
         run_seller_ui()
     else:
+        # This will trigger the buyer login and marketplace we just styled
         run_buyer_ui()
 
 if __name__ == "__main__":

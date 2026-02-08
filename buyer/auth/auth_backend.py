@@ -1,51 +1,32 @@
-import streamlit as st
 import database as db
-import hashlib
 
-def hash_password(password):
-    """Encodes the password for secure storage."""
-    return hashlib.sha256(password.encode()).hexdigest()
+def authenticate_user(email, password):
+    query = "SELECT * FROM users WHERE email = ? AND password = ?"
+    result = db.fetch_query(query, (email, password))
+    return result.iloc[0].to_dict() if not result.empty else None
 
-def handle_buyer_login(email, password):
-    """
-    Authenticates the buyer and stores data in session_state.
-    Matches the schema: user_id, name, email, password, role.
-    """
-    hashed_pw = hash_password(password)
-    query = "SELECT * FROM users WHERE email = ? AND password = ? AND role = 'buyer'"
+def register_user(name, email, password, role="buyer"):
+    check_query = "SELECT * FROM users WHERE email = ?"
+    existing = db.fetch_query(check_query, (email,))
+    if not existing.empty:
+        return False, "Email already registered!"
     
     try:
-        user_df = db.fetch_query(query, (email, hashed_pw))
-        if not user_df.empty:
-            # Converts the SQL row into a dictionary (includes 'user_id')
-            st.session_state.user_data = user_df.iloc[0].to_dict()
-            st.session_state.role = 'buyer'
-            st.session_state.logged_in = True
-            st.success("Login Successful!")
-            st.rerun()
-        else:
-            st.error("Invalid email or password. Please try again.")
+        insert_query = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)"
+        db.execute_query(insert_query, (name, email, password, role))
+        return True, "Registration Successful!"
     except Exception as e:
-        st.error(f"Authentication Error: {e}")
+        return False, f"Error: {str(e)}"
 
-def handle_buyer_registration(name, email, password):
-    """
-    Registers a new buyer account into the database.
-    """
-    hashed_pw = hash_password(password)
-    
+def verify_email_exists(email):
+    query = "SELECT * FROM users WHERE email = ?"
+    result = db.fetch_query(query, (email,))
+    return not result.empty
+
+def reset_password(email, new_password):
     try:
-        # Check if email is already taken
-        existing = db.fetch_query("SELECT email FROM users WHERE email = ?", (email,))
-        if not existing.empty:
-            st.warning("This email is already registered. Please login.")
-            return
-
-        # Insert record
-        db.execute_query(
-            "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'buyer')",
-            (name, email, hashed_pw)
-        )
-        st.success("Registration Successful! Switch to the Login tab to continue.")
-    except Exception as e:
-        st.error(f"Registration Failed: {e}")
+        query = "UPDATE users SET password = ? WHERE email = ?"
+        db.execute_query(query, (new_password, email))
+        return True
+    except:
+        return False

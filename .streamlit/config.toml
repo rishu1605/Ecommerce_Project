@@ -1,0 +1,6 @@
+[theme]
+primaryColor = "#F63366" # Your brand color
+backgroundColor = "#FFFFFF" # Main area background
+secondaryBackgroundColor = "#F0F2F6" # Sidebar background
+textColor = "#262730" # This MUST contrast with both backgrounds
+font = "sans serif"
