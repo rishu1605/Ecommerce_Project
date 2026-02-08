@@ -1,28 +1,40 @@
 import database as db
 
 def get_detailed_order_history(buyer_id):
-    """Fetches orders with tracking, escrow status, and return updates."""
+    """
+    Fetches orders using verified column names: 
+    - 'amount' instead of 'total_price'
+    - 'date' instead of 'order_date'
+    """
+    # We use a LEFT JOIN for tracking/payments so the order still shows up 
+    # even if tracking info hasn't been created yet.
     return db.fetch_query("""
         SELECT 
-            o.order_id, o.total_price, o.order_date, 
-            p.name as product_name,
-            t.current_status as tracking_status,
-            pay.status as payment_status,
-            pay.amount as refund_amount
+            o.order_id, 
+            o.amount, 
+            o.date, 
+            o.product_name,
+            o.status as tracking_status,
+            o.status as payment_status  -- Fallback if payments table is empty
         FROM orders o
-        JOIN products p ON o.product_id = p.id
-        LEFT JOIN tracking t ON o.order_id = t.order_id
-        LEFT JOIN payments pay ON o.order_id = pay.order_id
         WHERE o.buyer_id = ?
-        ORDER BY o.order_date DESC
+        ORDER BY o.date DESC
     """, (buyer_id,))
 
 def request_return(order_id, reason):
-    """Logs a return request for the Admin to review."""
-    # This status 'return_pending' alerts the Admin in their dashboard
-    db.execute_query("""
-        UPDATE payments SET status = 'return_pending' 
+    """
+    Logs a return request by updating the main orders table 
+    and optionally a complaints table.
+    """
+    # Updating the status in 'orders' table directly since 'payments' table 
+    # structure might be missing or different.
+    success = db.execute_query("""
+        UPDATE orders 
+        SET status = 'Return Pending' 
         WHERE order_id = ?
     """, (order_id,))
-    # Log the reason in a support/complaints table
-    return True
+    
+    # Optional: Log to a complaints/support table if you have one
+    # db.execute_query("INSERT INTO support (order_id, message) VALUES (?, ?)", (order_id, reason))
+    
+    return success

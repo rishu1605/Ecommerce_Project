@@ -7,8 +7,13 @@ from datetime import datetime
 from buyer.cart.cart_backend import get_cart_items, remove_from_cart, get_cart_total, clear_cart
 
 def render_cart_ui():
-    # Progress [cite: 2026-02-08]: High contrast header for better visibility
+    """Renders the main Shopping Cart interface."""
     st.markdown("<h2 style='color: white;'>🛒 Your Shopping Cart</h2>", unsafe_allow_html=True)
+    
+    if 'user_data' not in st.session_state or not st.session_state.user_data:
+        st.warning("Please login to view your cart.")
+        return
+
     user_id = st.session_state.user_data['user_id']
     cart_items = get_cart_items(user_id)
     
@@ -23,7 +28,7 @@ def render_cart_ui():
             with st.container(border=True):
                 col_img, col_info, col_del = st.columns([1.2, 2.5, 0.5])
                 
-                # --- BUG FIX: Safety check for NoneType image_url ---
+                # Image processing
                 image_val = item.get('image_url', "")
                 raw_img = ""
                 if image_val and isinstance(image_val, str) and image_val.lower() != 'nan':
@@ -37,7 +42,8 @@ def render_cart_ui():
                 
                 with col_info:
                     st.subheader(item['name'])
-                    st.write(f"**Price:** ₹{item['price']:,} | **Qty:** {item['quantity']}")
+                    st.write(f"**Price:** ₹{item['price']:,} | **Qty:** {item.get('quantity', 1)}")
+                
                 with col_del:
                     if st.button("❌", key=f"del_{item['cart_id']}"):
                         remove_from_cart(item['cart_id'])
@@ -47,6 +53,7 @@ def render_cart_ui():
         render_price_summary(user_id, cart_items)
 
 def render_buy_now_payment():
+    """Renders the Express Checkout for a single item."""
     st.title("⚡ Express Checkout")
     if st.button("⬅️ Back to Marketplace"):
         st.session_state.buy_now_active = False
@@ -55,12 +62,16 @@ def render_buy_now_payment():
     item = st.session_state.get("buy_now_item")
     user_id = st.session_state.user_data['user_id']
 
-    if item is not None and not item.empty:
-        # Ensure item is treated as a row
+    # Careful check for item validity
+    if item is not None:
+        # Convert Series to DataFrame if necessary for consistent processing
         if isinstance(item, pd.Series):
             temp_df = pd.DataFrame([item])
-        else:
+        elif isinstance(item, pd.DataFrame):
             temp_df = item
+        else:
+            st.error("Invalid item data.")
+            return
 
         if 'quantity' not in temp_df.columns:
             temp_df['quantity'] = 1
@@ -70,8 +81,7 @@ def render_buy_now_payment():
             with st.container(border=True):
                 c1, c2 = st.columns([1, 2])
                 
-                # --- BUG FIX: Safety check for Buy Now image ---
-                image_val = item.get('image_url', "")
+                image_val = temp_df.iloc[0].get('image_url', "")
                 img = ""
                 if image_val and isinstance(image_val, str) and image_val.lower() != 'nan':
                     img = image_val.split("|")[0]
@@ -79,14 +89,19 @@ def render_buy_now_payment():
                 with c1:
                     if img: st.image(img, use_container_width=True)
                 with c2:
-                    st.subheader(item['name'])
-                    st.write(f"Unit Price: ₹{item['price']:,}")
+                    st.subheader(temp_df.iloc[0]['name'])
+                    st.write(f"Unit Price: ₹{temp_df.iloc[0]['price']:,}")
         
         with col_summary:
             render_price_summary(user_id, temp_df, is_buy_now=True)
 
 def render_price_summary(user_id, items_df, is_buy_now=False):
-    subtotal = (items_df['price'] * items_df.get('quantity', 1)).sum()
+    """Calculates and displays the costs and taxes."""
+    # Ensure quantity is present to avoid math errors
+    if 'quantity' not in items_df.columns:
+        items_df['quantity'] = 1
+
+    subtotal = (items_df['price'] * items_df['quantity']).sum()
     tax_rate = 0.18
     gst_amt = subtotal * tax_rate
     platform_fee = 20.0
@@ -112,16 +127,20 @@ def render_price_summary(user_id, items_df, is_buy_now=False):
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.write("---")
-    process_checkout(final_total, items_df, user_id)
+    process_checkout(final_total, items_df, user_id, is_buy_now)
 
-def process_checkout(total_amt, items_df, user_id):
+def process_checkout(total_amt, items_df, user_id, is_buy_now):
+    """Handles address selection and payment processing."""
     st.write("### 📍 Shipping Address")
+    
+    # Fetch addresses
     saved_addr_df = db.fetch_query("SELECT * FROM addresses WHERE user_id = ?", (user_id,))
     user_prof = db.fetch_query("SELECT address FROM users WHERE user_id = ?", (user_id,))
     prof_addr = user_prof['address'][0] if not user_prof.empty else None
 
     addr_options = []
     addr_map = {}
+    
     if prof_addr and str(prof_addr) != 'None' and prof_addr.strip() != "":
         label = "🏠 Profile Address"
         addr_options.append(label)
@@ -145,7 +164,8 @@ def process_checkout(total_amt, items_df, user_id):
         new_label = col1.selectbox("Type", ["Home", "Work", "Other", "Friend"])
         new_addr = st.text_area("Full Address Details", placeholder="House/Flat No, Landmark, City, Pincode...")
         save_this = st.checkbox("Save this address for future checkouts")
-        if new_addr.strip(): final_address = new_addr
+        if new_addr.strip(): 
+            final_address = new_addr
     else:
         final_address = addr_map.get(selected_label, "")
         st.success(f"Selected: {final_address}")
@@ -160,6 +180,7 @@ def process_checkout(total_amt, items_df, user_id):
     with st.form(key="final_checkout_form"):
         method = st.radio("Choose Method:", ["👛 Sapphire Wallet", "📱 UPI", "💳 Card", "💵 Cash on Delivery"], key="pay_method")
         
+        # Payment Inputs
         if method == "📱 UPI":
             st.text_input("Enter UPI ID", placeholder="user@upi", key="upi_input_val")
         elif method == "💳 Card":
@@ -177,8 +198,10 @@ def process_checkout(total_amt, items_df, user_id):
             if method == "👛 Sapphire Wallet":
                 wallet = db.fetch_query("SELECT balance FROM wallets WHERE user_id=?", (user_id,))
                 bal = wallet['balance'][0] if not wallet.empty else 0
-                if bal >= total_amt: is_valid = True
-                else: error_msg = f"Insufficient balance. Need ₹{total_amt - bal:,.2f} more."
+                if bal >= total_amt: 
+                    is_valid = True
+                else: 
+                    error_msg = f"Insufficient balance. Need ₹{total_amt - bal:,.2f} more."
             elif method == "📱 UPI":
                 if st.session_state.get("upi_input_val", "").strip(): is_valid = True
                 else: error_msg = "Please enter your UPI ID."
@@ -189,42 +212,36 @@ def process_checkout(total_amt, items_df, user_id):
                 is_valid = True
 
             if is_valid:
+                # Save address if requested
                 if selected_label == "➕ Add New Address" and save_this:
                     db.execute_query("INSERT INTO addresses (user_id, label, address_text) VALUES (?, ?, ?)", (user_id, new_label, new_addr))
+                
+                # Deduct wallet balance
                 if method == "👛 Sapphire Wallet":
                     db.execute_query("UPDATE wallets SET balance = balance - ? WHERE user_id = ?", (total_amt, user_id))
-                finalize_order(user_id, items_df, total_amt, final_address)
+                
+                finalize_order(user_id, items_df, total_amt, final_address, is_buy_now)
             else:
                 st.error(f"❌ {error_msg}")
 
-def finalize_order(user_id, items_df, final_total, address):
+def finalize_order(user_id, items_df, final_total, address, is_buy_now):
+    """Writes the order to the DB and cleans up the UI state."""
     try:
         for _, item in items_df.iterrows():
+            # Use .get() for safety on potentially missing columns
             db.execute_query(
                 """INSERT INTO orders (buyer_id, product_name, amount, shipping_address, status, date) 
                    VALUES (?, ?, ?, ?, 'Confirmed', ?)""",
                 (user_id, item['name'], item['price'] * item.get('quantity', 1), address, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
         
-        # --- FIXED TRUTH VALUE ERROR HERE ---
-        bn_item = st.session_state.get("buy_now_item")
-        
-        # Check if buy_now_item is None or Empty without causing ambiguity
-        is_buy_now_empty = True
-        if bn_item is not None:
-            if isinstance(bn_item, (pd.DataFrame, pd.Series)):
-                is_buy_now_empty = bn_item.empty
-            else:
-                is_buy_now_empty = False
-
-        if is_buy_now_empty: 
-            clear_cart(user_id)
-        else:
+        # UI Cleanup Logic
+        if is_buy_now:
             st.session_state.buy_now_item = None
+            st.session_state.buy_now_active = False
+        else:
+            clear_cart(user_id)
         
-        st.session_state.buy_now_active = False
-        # ------------------------------------
-
         st.success(f"🎉 Order of ₹{final_total:,.2f} confirmed!")
         st.balloons()
         time.sleep(2)

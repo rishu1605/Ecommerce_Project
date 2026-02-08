@@ -1,6 +1,7 @@
 import streamlit as st
 import database as db
 from seller.auth.auth_ui import render_seller_auth
+from seller.orders.orders_ui import render_orders_management
 
 # Fixed Imports: Removed duplicates and consolidated
 from seller.inventory.inventory_ui import show_inventory_listing, render_inventory_management
@@ -56,8 +57,7 @@ def run_seller_ui():
                     render_inventory_management()
 
         elif menu == "📑 Shop Orders":
-            st.subheader("Order Management")
-            # Integration point for order fulfillment
+            render_orders_management()
 
         elif menu == "👤 Profile":
             # Calling the specific function defined in your profile_ui.py

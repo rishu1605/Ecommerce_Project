@@ -29,7 +29,7 @@ def set_up_tables():
         )
         """)
 
-        # 2. ADDRESSES (Stores multiple addresses per user)
+        # 2. ADDRESSES
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS addresses (
             address_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -110,7 +110,7 @@ def set_up_tables():
         )
         """)
 
-        # 8. PAYMENTS
+        # 8. PAYMENTS (NEW/UPDATED: Added status for Escrow/Released logic)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS payments (
             payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,13 +118,25 @@ def set_up_tables():
             user_id INTEGER,
             amount REAL,
             type TEXT,
-            status TEXT,
+            status TEXT, -- Values: 'Pending', 'Escrow', 'Released'
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (order_id) REFERENCES orders(order_id),
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
         """)
 
-        # 9. CART (Ensuring buyer_id matches your Backend logic)
+        # 9. TRACKING (NEW: Required for 'Active Shipments' and 'New Orders' logic)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tracking (
+            tracking_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER,
+            current_status TEXT, -- Values: 'Shipped', 'Out for Delivery', 'Delivered'
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (order_id) REFERENCES orders(order_id)
+        )
+        """)
+
+        # 10. CART
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS cart (
             cart_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -135,7 +147,8 @@ def set_up_tables():
             FOREIGN KEY (product_id) REFERENCES products(product_id)
         )
         """)
-        # 10. TICKETS (Add this block to fix your error)
+
+        # 11. TICKETS
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS tickets (
             ticket_id INTEGER PRIMARY KEY AUTOINCREMENT,
