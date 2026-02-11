@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from .profile_backend import get_full_seller_profile, update_seller_profile
 
 def render_seller_profile():
@@ -59,6 +60,7 @@ def render_seller_profile():
             if success:
                 st.success(msg)
                 st.session_state.user_data['name'] = u_name
+                time.sleep(2)
                 st.rerun()
             else:
                 st.error(msg)
