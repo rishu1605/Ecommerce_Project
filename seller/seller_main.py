@@ -47,7 +47,7 @@ def run_seller_ui():
             render_seller_dashboard()
 
         elif menu == "📦 Inventory":
-            if status != "Approved":
+            if status != "Approved": 
                 st.error("🚨 Access Denied: Your account must be 'Approved' by an Admin to list products.")
             else:
                 tab1, tab2 = st.tabs(["➕ List New Item", "🛠️ Manage Existing Inventory"])
